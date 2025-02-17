@@ -1,5 +1,7 @@
 # Jay's Matrix32
-simple esp32 8x8 rgb led matrix firmware
+simple led matrix firmware for the Waveshare ESP32-S3-Matrix
+
+![Matrix32](https://github.com/user-attachments/assets/fc393f76-0faa-4ad8-b573-b27a3ac126dc)
 
 ## Start-up
 - Connect to WiFi labelled as Jay's Matrix32 with the psk: password
