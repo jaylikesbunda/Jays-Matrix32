@@ -443,8 +443,8 @@ const char MATRIX_UI_HTML[] = R"=====(
             pendingUpdates.push({
                 row: Math.floor(index / 8),
                 col: index % 8,
-                r: newColor.g,
-                g: newColor.r,
+                r: newColor.r,  // Now correctly sending red as red
+                g: newColor.g,  // And green as green
                 b: newColor.b
             });
             
@@ -475,31 +475,31 @@ const char MATRIX_UI_HTML[] = R"=====(
         // Bulk operations.
         document.getElementById('clear').addEventListener('click', () => {
             const pixels = document.querySelectorAll('.pixel');
-            const updates = [];
-            pixels.forEach((p, i) => {
-                p.style.backgroundColor = '#000';
-                updates.push({
-                    row: Math.floor(i / 8),
-                    col: i % 8,
-                    r: 0, g: 0, b: 0
-                });
-            });
-            logApiCall('/pixel', { updates });  // Use logApiCall with updates array
+            pixels.forEach(p => p.style.backgroundColor = '#000');
+            fetch('/pixel', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    fill: 'yes',
+                    r: 0,
+                    g: 0,
+                    b: 0
+                })
+            }).catch(err => console.error('Clear failed:', err));
         });
         document.getElementById('fill').addEventListener('click', () => {
             const pixels = document.querySelectorAll('.pixel');
-            const updates = [];
-            pixels.forEach((p, i) => {
-                p.style.backgroundColor = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`;
-                updates.push({
-                    row: Math.floor(i / 8),
-                    col: i % 8,
-                    r: currentColor.r,  // Send green as red (GRB order)
-                    g: currentColor.g,  // Send red as green
-                    b: currentColor.b   // Blue stays the same
-                });
-            });
-            logApiCall('/pixel', { updates });  // Use logApiCall with updates array
+            pixels.forEach(p => p.style.backgroundColor = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`);
+            fetch('/pixel', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    fill: 'yes',
+                    r: currentColor.r,
+                    g: currentColor.g,
+                    b: currentColor.b
+                })
+            }).catch(err => console.error('Fill failed:', err));
         });
         
         // Image upload & downscale using Canvas.

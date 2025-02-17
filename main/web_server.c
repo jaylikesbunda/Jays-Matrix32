@@ -33,30 +33,57 @@ esp_err_t pixel_handler(httpd_req_t *req) {
         return ESP_FAIL;
     }
     
-    cJSON *updates = cJSON_GetObjectItem(root, "updates");
-    if (!updates) {
-        ESP_LOGE(TAG, "No 'updates' key in JSON");
-        cJSON_Delete(root);
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing updates");
-        return ESP_FAIL;
-    }
-    
-    cJSON *update = NULL;
-    cJSON_ArrayForEach(update, updates) {
-        uint8_t row = cJSON_GetObjectItem(update, "row")->valueint;
-        uint8_t col = cJSON_GetObjectItem(update, "col")->valueint;
-        uint8_t r = cJSON_GetObjectItem(update, "r")->valueint;
-        uint8_t g = cJSON_GetObjectItem(update, "g")->valueint;
-        uint8_t b = cJSON_GetObjectItem(update, "b")->valueint;
+    // Check for fill parameter first
+    cJSON *fill = cJSON_GetObjectItem(root, "fill");
+    if (fill && cJSON_IsString(fill) && strcmp(fill->valuestring, "yes") == 0) {
+        // Get the RGB values
+        cJSON *r = cJSON_GetObjectItem(root, "r");
+        cJSON *g = cJSON_GetObjectItem(root, "g");
+        cJSON *b = cJSON_GetObjectItem(root, "b");
         
-        framebuffer[row][col] = (pixel_color_t){r, g, b};
-        ESP_LOGI(TAG, "Updating pixel (%d,%d) to RGB(%d,%d,%d)", row, col, r, g, b);
+        if (r && g && b) {
+            // Fill all pixels with the same color
+            for (int row = 0; row < MATRIX_ROWS; row++) {
+                for (int col = 0; col < MATRIX_COLS; col++) {
+                    framebuffer[row][col] = (pixel_color_t){
+                        r->valueint,
+                        g->valueint,
+                        b->valueint
+                    };
+                }
+            }
+            ESP_LOGI(TAG, "Filled all pixels with RGB(%d,%d,%d)", 
+                    r->valueint, g->valueint, b->valueint);
+        }
+    } else {
+        // Handle normal pixel updates array
+        cJSON *updates = cJSON_GetObjectItem(root, "updates");
+        if (!updates) {
+            ESP_LOGE(TAG, "No 'updates' key in JSON");
+            cJSON_Delete(root);
+            httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing updates");
+            return ESP_FAIL;
+        }
+        
+        cJSON *update = NULL;
+        cJSON_ArrayForEach(update, updates) {
+            uint8_t row = cJSON_GetObjectItem(update, "row")->valueint;
+            uint8_t col = cJSON_GetObjectItem(update, "col")->valueint;
+            uint8_t r = cJSON_GetObjectItem(update, "r")->valueint;
+            uint8_t g = cJSON_GetObjectItem(update, "g")->valueint;
+            uint8_t b = cJSON_GetObjectItem(update, "b")->valueint;
+            
+            framebuffer[row][col] = (pixel_color_t){r, g, b};
+            ESP_LOGI(TAG, "Updating pixel (%d,%d) to RGB(%d,%d,%d)", row, col, r, g, b);
+        }
     }
     
     cJSON_Delete(root);
     ESP_LOGI(TAG, "Calling update_display");
     update_display();
-    httpd_resp_send(req, "{\"status\":\"ok\"}", HTTPD_RESP_USE_STRLEN);
+    
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, "{\"status\":\"ok\"}", -1);
     return ESP_OK;
 }
 
