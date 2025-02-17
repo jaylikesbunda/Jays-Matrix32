@@ -1,6 +1,10 @@
 # Jay's Matrix32
 simple esp32 8x8 rgb led matrix firmware
 
+## Start-up
+- Connect to WiFi labelled as Jay's Matrix32 with the psk: password
+- Head to 192.168.4.1
+
 ## Features
 - Real-time pixel control via web interface
 - 🌟 Multiple display modes:
