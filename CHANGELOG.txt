@@ -3,6 +3,7 @@
 ### 1.0.1
 - fixed color order for matrix
 - clear and fill buttons now work
+- webui now accessible via mDNS at http://matrix32.local
 
-### 1.0.0
+### 1.0
 - initial release

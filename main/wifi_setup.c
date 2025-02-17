@@ -4,6 +4,7 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_netif.h"
+#include "mdns.h"
 #include "wifi_setup.h"
 
 #define WIFI_SSID "Jay's Matrix32"
@@ -36,4 +37,10 @@ void wifi_init_softap(void)
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_LOGI(TAG, "WiFi AP started with SSID:%s password:%s", WIFI_SSID, WIFI_PASS);
+
+    ESP_ERROR_CHECK(mdns_init());
+    ESP_ERROR_CHECK(mdns_hostname_set("matrix32"));
+    ESP_ERROR_CHECK(mdns_instance_name_set("Jay's Matrix32"));
+    ESP_ERROR_CHECK(mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0));
+    ESP_LOGI(TAG, "mDNS initialized: access the web UI at http://matrix32.local");
 } 

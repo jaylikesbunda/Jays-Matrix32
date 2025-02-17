@@ -77,8 +77,8 @@ void mode_update_task(void *param) {
                     uint8_t r_val, g_val, b_val;
                     hsv2rgb(h, 1.0f, 1.0f, &r_val, &g_val, &b_val);
                     ESP_ERROR_CHECK(led_strip_set_pixel(strip, i, 
-                        scale_brightness(r_val),
                         scale_brightness(g_val),
+                        scale_brightness(r_val),
                         scale_brightness(b_val)));
                 }
                 ESP_ERROR_CHECK(led_strip_refresh(strip));
@@ -117,7 +117,7 @@ void mode_update_task(void *param) {
                         r = scale_brightness(r);
                         g = scale_brightness(g);
                         b = scale_brightness(b);
-                        ESP_ERROR_CHECK(led_strip_set_pixel(strip, led_index, r, g, b));
+                        ESP_ERROR_CHECK(led_strip_set_pixel(strip, led_index, g, r, b));
                     }
                 }
                 gradient_offset = (gradient_offset + 1) % MATRIX_COLS;
@@ -131,8 +131,8 @@ void mode_update_task(void *param) {
                     uint8_t g_rand = (uint8_t)(rand() % 256);
                     uint8_t b_rand = (uint8_t)(rand() % 256);
                     ESP_ERROR_CHECK(led_strip_set_pixel(strip, i,
-                        scale_brightness(r_rand),
                         scale_brightness(g_rand),
+                        scale_brightness(r_rand),
                         scale_brightness(b_rand)));
                 }
                 ESP_ERROR_CHECK(led_strip_refresh(strip));
