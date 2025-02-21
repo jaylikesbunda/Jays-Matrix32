@@ -1,5 +1,5 @@
 # Jay's Matrix32
-simple led matrix firmware for the Waveshare ESP32-S3-Matrix
+simple led matrix firmware for the [Waveshare ESP32-S3-Matrix](https://www.waveshare.com/esp32-s3-matrix.htm)
 
 ![Matrix32](https://github.com/user-attachments/assets/fc393f76-0faa-4ad8-b573-b27a3ac126dc)
 
