@@ -2,7 +2,7 @@
 
 ### 1.0.2
 - fixed primary color setting
-- fixed brightness setting
+- fixed brightness setting percent not changing
 - fixed mdns being hosted in debug mode
 - oops lol
 
