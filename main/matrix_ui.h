@@ -220,7 +220,7 @@ const char MATRIX_UI_HTML[] = R"=====(
         // API call helper.
         function logApiCall(endpoint, data) {
             console.log("Sending to", endpoint, data); // DEBUG LINE
-            if (window.location.hostname !== '192.168.4.1') {
+            if (!['192.168.4.1', 'matrix32.local'].includes(window.location.hostname)) {
                 document.getElementById('debug').innerHTML = `API Call to ${endpoint}:<br>${JSON.stringify(data, null, 2)}`;
                 return Promise.resolve({ status: 'ok' });
             }
@@ -333,6 +333,7 @@ const char MATRIX_UI_HTML[] = R"=====(
                     body: JSON.stringify({brightness: value})
                 }).catch(err => console.error('Brightness error:', err));
             }, 200);
+            brightnessValue.textContent = `${Math.round((e.target.value / 255) * 100)}%`;
         });
         
         // Event: Primary color picker update.
@@ -341,6 +342,13 @@ const char MATRIX_UI_HTML[] = R"=====(
             const rgb = hexToRgb(event.target.value);
             if (rgb) {
                 currentColor = rgb;
+                if (selectedMode === "checkerboard" || selectedMode === "gradient") {
+                    fetch('/primarycolor', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(rgb)
+                    });
+                }
                 if (selectedMode !== "static") {
                     updatePreview(selectedMode);
                 }

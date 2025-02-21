@@ -1,3 +1,4 @@
 /build
 /.cache
 /managed_components
+sdkconfig.old

@@ -166,6 +166,31 @@ esp_err_t set_secondary_color_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t set_primary_color_handler(httpd_req_t *req)
+{
+    char buf[100];
+    int ret = httpd_req_recv(req, buf, sizeof(buf) - 1);
+    if (ret <= 0) return ESP_FAIL;
+    
+    buf[ret] = '\0';
+    cJSON *root = cJSON_Parse(buf);
+    if (root) {
+        cJSON *r_item = cJSON_GetObjectItem(root, "r");
+        cJSON *g_item = cJSON_GetObjectItem(root, "g");
+        cJSON *b_item = cJSON_GetObjectItem(root, "b");
+        if (r_item && g_item && b_item) {
+            current_color.r = r_item->valueint;
+            current_color.g = g_item->valueint;
+            current_color.b = b_item->valueint;
+        }
+        cJSON_Delete(root);
+    }
+    
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, "{\"status\":\"ok\"}", -1);
+    return ESP_OK;
+}
+
 esp_err_t get_pixels_handler(httpd_req_t *req)
 {
     cJSON *root = cJSON_CreateArray();
@@ -237,6 +262,13 @@ httpd_handle_t start_webserver(void)
         .user_ctx  = NULL
     };
 
+    httpd_uri_t primary_color_uri = {
+        .uri       = "/primarycolor",
+        .method    = HTTP_POST,
+        .handler   = set_primary_color_handler,
+        .user_ctx  = NULL
+    };
+
     httpd_uri_t pixels_get_uri = {
         .uri = "/pixels",
         .method = HTTP_GET,
@@ -249,6 +281,7 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &brightness);
         httpd_register_uri_handler(server, &mode);
         httpd_register_uri_handler(server, &secondary_color_uri);
+        httpd_register_uri_handler(server, &primary_color_uri);
         httpd_register_uri_handler(server, &pixels_get_uri);
         return server;
     }

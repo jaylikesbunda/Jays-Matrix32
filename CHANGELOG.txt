@@ -1,5 +1,11 @@
 ## Changelog
 
+### 1.0.2
+- fixed primary color setting
+- fixed brightness setting
+- fixed mdns being hosted in debug mode
+- oops lol
+
 ### 1.0.1
 - fixed color order for matrix
 - clear and fill buttons now work
